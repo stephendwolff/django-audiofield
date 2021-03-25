@@ -158,6 +158,22 @@ Create audiofield.log file::
     touch /var/log/audio-field.log
 
 
+Celery
+======
+
+Add celery to the django project, see
+
+ - https://docs.celeryproject.org/en/v5.0.5/django/first-steps-with-django.html
+
+[ nb if you prefer redis to RabbitMQ, use `pip install celery[redis]`
+
+Run celery worker with everything installed in a virtual environment using:
+
+```
+(venv)$ celery -A <project name> worker -l INFO
+```
+[ in same directory as settings, ie above manage.py ]
+
 Contributing
 ============
 
