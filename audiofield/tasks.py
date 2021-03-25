@@ -66,8 +66,9 @@ def run_convert_task(conv):
     (output, error) = response.communicate()
     if error:
         logger.error('Error conversion : %s ' % error)
+        return {'error': error.decode('utf-8')}
 
-    return response
+    return {'success': output.decode('utf-8')}
 
 
 @task()
