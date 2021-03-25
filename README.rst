@@ -64,6 +64,12 @@ Install avconv on Redhat/CentOS::
     sudo make
     sudo make install
 
+Install dependencies on macOS (via homebrew)::
+
+    brew install sox mpg321 libav
+
+
+    it looks like dir2ogg may be installed from source. YMMV
 
 Settings
 ========
