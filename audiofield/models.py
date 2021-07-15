@@ -62,7 +62,7 @@ class AudioFile(models.Model):
         if self.audio_file:
             file_url = settings.MEDIA_URL + str(self.audio_file)
             player_string = '<audio src="%s" controls>Your browser does not support the audio element.</audio>' % \
-                (file_url)
+                            file_url
             return player_string
 
     audio_file_player.allow_tags = True

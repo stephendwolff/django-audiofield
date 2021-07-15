@@ -39,10 +39,10 @@ def random_string(char_length=5, digit_length=10):
 
 
 class StdAudioField:
-    '''
+    """
     Instances of this class will be used to access data of the converted
     audio files
-    '''
+    """
     def __init__(self, name):
         self.name = name
         self.storage = FileSystemStorage()
@@ -58,12 +58,12 @@ class StdAudioField:
 
 
 class AudioField(FileField):
-    '''
+    """
     Django field that behaves as FileField, with some extra features like:
         - Audio Player
         - Delete specific file
         - Convert to specific format
-    '''
+    """
     size = None
     uuid = None
     filename_prefix = 'audio-file-'
@@ -102,19 +102,19 @@ class AudioField(FileField):
 
         return data
 
-    def _get_converted_filename(self, filename):
-        # Not used
-        '''Returns the audio converted name associated to the standard audio filename
-        * Example: /var/www/myproject/media/audio/picture_1.wav
-            will return /var/www/myproject/media/audio/picture_1.converted.wav
-        '''
-        splitted_filename = list(os.path.splitext(filename))
-        splitted_filename.insert(1, '.converted')
-        logger.debug('converted file name')
-        return ''.join(splitted_filename)
+    # def _get_converted_filename(self, filename):
+    #     # Not used
+    #     """Returns the audio converted name associated to the standard audio filename
+    #     * Example: /var/www/myproject/media/audio/picture_1.wav
+    #         will return /var/www/myproject/media/audio/picture_1.converted.wav
+    #     """
+    #     splitted_filename = list(os.path.splitext(filename))
+    #     splitted_filename.insert(1, '.converted')
+    #     logger.debug('converted file name')
+    #     return ''.join(splitted_filename)
 
     def _convert_audio(self, filename, instance=None, ext=None):
-        '''Convert uploaded audio file to selected format'''
+        """Convert uploaded audio file to selected format"""
         request = threadlocals.get_current_request()
 
         convert_type = 0
@@ -204,8 +204,8 @@ class AudioField(FileField):
             result = audio_convert_task.delay(conv)
 
     def _rename_audio(self, instance=None, **kwargs):
-        '''Rename uploaded audio file & calls methods to convert audio file format if
-        convert_to is selected'''
+        """Rename uploaded audio file & calls methods to convert audio file format if
+        convert_to is selected"""
         if getattr(instance, self.name):
             filename = getattr(instance, self.name).path
 
@@ -237,24 +237,24 @@ class AudioField(FileField):
                             """
                         ext = '.' + CONVERT_TYPE_CHK[convert_type]
                         dst = self.generate_filename(instance, '%s%s%s' %
-                                                    (self.filename_prefix, self.uuid, ext))
+                                                     (self.filename_prefix, self.uuid, ext))
                     setattr(instance, self.attname, dst)
                     instance.save()
             else:
-                error_msg = ("file already exists!")
+                error_msg = "file already exists!"
                 logger.error(error_msg)
 
     def _set_audio_converted(self, instance=None, **kwargs):
-        '''Creates a "audio_field" object as attribute of the FileField instance
+        """Creates a "audio_field" object as attribute of the FileField instance
         audio_field attribute will be of the same class of original file, so
-        "path", "url", "name"... properties can be used'''
+        "path", "url", "name"... properties can be used"""
         if getattr(instance, self.name):
             filename = self.generate_filename(instance, os.path.basename(getattr(instance, self.name).path))
             audio_field = StdAudioField(filename)
             setattr(getattr(instance, self.name), 'audio_converted', audio_field)
 
     def formfield(self, **kwargs):
-        '''Specify form field and widget to be used on the forms'''
+        """Specify form field and widget to be used on the forms"""
         from audiofield.widgets import AdminAudioFileWidget
         from audiofield.forms import AudioFormField
         kwargs['widget'] = AdminAudioFileWidget
@@ -263,8 +263,10 @@ class AudioField(FileField):
         return super(AudioField, self).formfield(**kwargs)
 
     def save_form_data(self, instance, data):
-        '''Overwrite save_form_data to delete audio files if "delete" checkbox
-        is selected'''
+        """
+        Overwrite save_form_data to delete audio files if "delete" checkbox
+        is selected
+        """
         if data == '__deleted__':
             filename = getattr(instance, self.name).path
             if os.path.exists(filename):
@@ -277,22 +279,22 @@ class AudioField(FileField):
             super(AudioField, self).save_form_data(instance, data)
 
     def contribute_to_class(self, cls, name):
-        '''Call methods for generating all operations on specified signals'''
+        """Call methods for generating all operations on specified signals"""
         super(AudioField, self).contribute_to_class(cls, name)
-        signals.post_save.connect(self._rename_audio, sender=cls)
-        signals.post_init.connect(self._set_audio_converted, sender=cls)
+        # signals.post_save.connect(self._rename_audio, sender=cls)
+        # signals.post_init.connect(self._set_audio_converted, sender=cls)
 
 
-try:
-    from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([(
-            [AudioField],
-            [],
-            {
-                "ext_whitelist": ["ext_whitelist", {}],
-            },
-        ),
-    ], ["^audiofield\.fields\.AudioField"])
-except ImportError:
-    # South is not enabled
-    pass
+# try:
+#     from south.modelsinspector import add_introspection_rules
+#     add_introspection_rules([(
+#             [AudioField],
+#             [],
+#             {
+#                 "ext_whitelist": ["ext_whitelist", {}],
+#             },
+#         ),
+#     ], ["^audiofield\.fields\.AudioField"])
+# except ImportError:
+#     # South is not enabled
+#     pass
