@@ -12,7 +12,8 @@
 #
 
 from celery.utils.log import get_task_logger
-from celery.decorators import task
+from celery import shared_task
+
 import subprocess
 import os
 from uuid import uuid1
@@ -23,7 +24,7 @@ logger = get_task_logger(__name__)
 DELAY_TASK = 5  # Seconds
 
 
-@task()
+@shared_task
 def audio_convert_task(conv):
     """Convert audio files"""
 
@@ -33,7 +34,7 @@ def audio_convert_task(conv):
     return True
 
 
-@task()
+@shared_task
 def run_convert_task(conv):
     """
     Exec the audio convert
@@ -71,7 +72,7 @@ def run_convert_task(conv):
     return {'success': output.decode('utf-8')}
 
 
-@task()
+@shared_task
 def old_run_convert_task(conv):
     """Exec the audio convert"""
 
